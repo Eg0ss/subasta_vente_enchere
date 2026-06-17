@@ -3,16 +3,8 @@
     <Card class="w-full max-w-md">
       <CardContent class="p-8">
         <div class="flex flex-col items-center mb-8">
-          <div class="flex items-center gap-2.5 mb-4">
-            <div class="size-10 rounded-md bg-primary flex items-center justify-center">
-              <svg class="size-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2L4 12h3 7v10h10l5-5z"></path>
-                <path d="M9 21h10"></path>
-              </svg>
-            </div>
-            <span class="font-serif text-2xl font-bold text-primary">
-              <span class="text-accent">S</span>ubasta
-            </span>
+          <div class="mb-4">
+            <Logo />
           </div>
           <p class="text-neutral-500 text-center">Connectez-vous pour accéder à la plateforme</p>
         </div>
@@ -65,6 +57,7 @@ import Button from '@/components/ui/Button.vue'
 import Input from '@/components/ui/Input.vue'
 import Label from '@/components/ui/Label.vue'
 import Separator from '@/components/ui/Separator.vue'
+import Logo from '@/components/ui/Logo.vue'
 
 const appStore = useAppStore()
 
