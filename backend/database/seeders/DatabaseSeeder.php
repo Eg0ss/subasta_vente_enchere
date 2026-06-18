@@ -18,6 +18,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Appel des autres seeders
+        $this->call([
+            CategorieSeeder::class,
+        ]);
+
         // Création des rôles via Spatie
         $adminRole = Role::create(['name' => 'admin', 'guard_name' => 'web']);
         $membreRole = Role::create(['name' => 'membre', 'guard_name' => 'web']);
@@ -27,6 +32,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin Subasta',
             'email' => 'admin@subasta.fr',
             'password' => Hash::make('admin'),
+            'role' => 'admin',
+            'statut' => 'actif',
             'email_verified_at' => now(),
         ]);
         $admin->assignRole($adminRole);
@@ -36,6 +43,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Membre Demo',
             'email' => 'membre@subasta.fr',
             'password' => Hash::make('demo'),
+            'role' => 'client',
+            'statut' => 'actif',
             'email_verified_at' => now(),
         ]);
         $membre->assignRole($membreRole);
