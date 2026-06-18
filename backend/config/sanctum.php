@@ -1,69 +1,56 @@
 <?php
 
+use Laravel\Sanctum\Sanctum;
+
 return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Defaults
+    | Stateful Domains
     |--------------------------------------------------------------------------
     */
 
-    'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
-    ],
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+        '%s%s%s',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+        Sanctum::currentApplicationUrlWithPort(),
+        env('FRONTEND_URL') ? ','.parse_url(env('FRONTEND_URL'), PHP_URL_HOST) : ''
+    ))),
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Guards
+    | Sanctum Guards
     |--------------------------------------------------------------------------
     */
 
-    'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-        'api' => [
-            'driver' => 'sanctum',
-            'provider' => 'users',
-        ],
-    ],
+    'guard' => ['web'],
 
     /*
     |--------------------------------------------------------------------------
-    | User Providers
+    | Expiration Minutes
     |--------------------------------------------------------------------------
     */
 
-    'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ],
-    ],
+    'expiration' => null,
 
     /*
     |--------------------------------------------------------------------------
-    | Resetting Passwords
+    | Token Prefix
     |--------------------------------------------------------------------------
     */
 
-    'passwords' => [
-        'users' => [
-            'provider' => 'users',
-            'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-    ],
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
 
     /*
     |--------------------------------------------------------------------------
-    | Password Confirmation Timeout
+    | Sanctum Middleware
     |--------------------------------------------------------------------------
     */
 
-    'password_timeout' => 10800,
+    'middleware' => [
+        'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
+        'encrypt_cookies' => App\Http\Middleware\EncryptCookies::class,
+        'verify_csrf_token' => App\Http\Middleware\VerifyCsrfToken::class,
+    ],
 
 ];

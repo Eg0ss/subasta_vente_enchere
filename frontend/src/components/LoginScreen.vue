@@ -67,20 +67,20 @@ const loginData = ref({
 })
 const error = ref('')
 
-function handleLogin() {
+async function handleLogin() {
   error.value = ''
-  const result = appStore.login(loginData.value.email, loginData.value.password)
+  const result = await appStore.login(loginData.value.email, loginData.value.password)
   if (!result.ok) {
-    error.value = 'Identifiants incorrects'
+    error.value = result.error || 'Identifiants incorrects'
   }
 }
 
-function demoLogin(type) {
+async function demoLogin(type) {
   error.value = ''
   if (type === 'user') {
-    appStore.login('membre@subasta.fr', 'demo')
+    await appStore.login('membre@subasta.fr', 'demo')
   } else {
-    appStore.login('admin@subasta.fr', 'admin')
+    await appStore.login('admin@subasta.fr', 'admin')
   }
 }
 </script>

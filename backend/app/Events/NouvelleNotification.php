@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Enchere;
+use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,29 +12,29 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Événement déclenché lors d'une nouvelle enchère.
- * Diffusé sur le canal public de l'annonce pour mettre à jour tous les clients.
+ * Événement pour notifier un utilisateur spécifique en temps réel.
+ * Diffusé sur un canal privé réservé à l'utilisateur.
  */
-class NouvelleEnchereProposee implements ShouldBroadcast
+class NouvelleNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $enchere;
+    public $notification;
 
-    public function __construct(Enchere $enchere)
+    public function __construct(Notification $notification)
     {
-        $this->enchere = $enchere->load('acheteur');
+        $this->notification = $notification;
     }
 
     public function broadcastOn(): array
     {
         return [
-            new Channel('annonce.' . $this->enchere->annonce_id),
+            new PrivateChannel('user.' . $this->notification->user_id),
         ];
     }
 
     public function broadcastAs(): string
     {
-        return 'enchere.created';
+        return 'notification.received';
     }
 }

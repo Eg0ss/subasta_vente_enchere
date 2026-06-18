@@ -3,24 +3,27 @@
 namespace App\Listeners;
 
 use App\Events\NouvelleEnchereProposee;
+use App\Services\NotificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
-class EnvoyerNotificationEnchere
+class EnvoyerNotificationEnchere implements ShouldQueue
 {
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
     {
-        //
+        $this->notificationService = $notificationService;
     }
 
-    /**
-     * Handle the event.
-     */
     public function handle(NouvelleEnchereProposee $event): void
     {
-        //
+        $vendeurId = $event->enchere->annonce->vendeur_id;
+        
+        $this->notificationService->notifier(
+            $vendeurId,
+            'nouvelle_enchere',
+            "Une nouvelle enchère de {$event->enchere->montant}€ a été placée sur votre annonce '{$event->enchere->annonce->titre}'.",
+            ['annonce_id' => $event->enchere->annonce_id]
+        );
     }
 }

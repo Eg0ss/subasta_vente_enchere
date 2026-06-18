@@ -4,6 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Migration pour la table 'users'.
+ * Cette migration définit la structure de base pour stocker les utilisateurs.
+ */
 return new class extends Migration
 {
     /**

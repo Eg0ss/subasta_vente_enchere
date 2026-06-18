@@ -9,11 +9,15 @@ class EnchereResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'annonce_id' => $this->annonce_id,
+            'acheteur' => new UserResource($this->whenLoaded('acheteur')),
+            'montant' => $this->montant,
+            'created_at' => $this->created_at,
+        ];
     }
 }

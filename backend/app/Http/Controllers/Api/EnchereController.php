@@ -3,48 +3,51 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Enchere;
+use App\Models\Annonce;
+use App\Services\EnchereService;
+use App\Http\Resources\EnchereResource;
 use Illuminate\Http\Request;
 
+/**
+ * Contrôleur pour la gestion des enchères.
+ */
 class EnchereController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $enchereService;
+
+    public function __construct(EnchereService $enchereService)
     {
-        //
+        $this->enchereService = $enchereService;
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Propose une nouvelle enchère sur une annonce.
      */
-    public function store(Request $request)
+    public function proposer(Request $request, Annonce $annonce)
     {
-        //
+        $validated = $request->validate([
+            'montant' => 'required|numeric|min:1'
+        ]);
+
+        $enchere = $this->enchereService->placerEnchere(
+            $annonce,
+            $request->user()->id,
+            $validated['montant']
+        );
+
+        return new EnchereResource($enchere);
     }
 
     /**
-     * Display the specified resource.
+     * Historique des enchères pour une annonce spécifique.
      */
-    public function show(Enchere $enchere)
+    public function historique(Annonce $annonce)
     {
-        //
-    }
+        $encheres = $annonce->encheres()
+            ->with('acheteur')
+            ->latest()
+            ->paginate(20);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Enchere $enchere)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Enchere $enchere)
-    {
-        //
+        return EnchereResource::collection($encheres);
     }
 }

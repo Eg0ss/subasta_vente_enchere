@@ -1,20 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-
-const DEMO_USERS = [
-  {
-    email: "membre@subasta.fr",
-    password: "demo",
-    name: "Camille Laurent",
-    role: "user",
-  },
-  {
-    email: "admin@subasta.fr",
-    password: "admin",
-    name: "Direction Subasta",
-    role: "admin",
-  },
-]
+import api from '@/services/api'
+import { useAuthStore } from './authStore'
 
 const CATEGORIES = [
   "Horlogerie",
@@ -163,30 +150,28 @@ function timeLeft(endsAt) {
 }
 
 export const useAppStore = defineStore('app', () => {
-  const user = ref(null)
+  const authStore = useAuthStore()
   const activeProfile = ref('buyer')
   const lots = ref([...INITIAL_LOTS])
   const activeAdminTab = ref('dashboard')
   const activeBuyerPage = ref('home')
   const activeSellerPage = ref('home')
 
-  const isAuthenticated = computed(() => !!user.value)
-  const isAdmin = computed(() => user.value?.role === 'admin')
+  const user = computed(() => authStore.user)
+  const isAuthenticated = computed(() => authStore.isAuthenticated)
+  const isAdmin = computed(() => authStore.hasRole('admin'))
 
-  function login(email, password) {
-    const found = DEMO_USERS.find(u => u.email === email && u.password === password)
-    if (found) {
-      user.value = found
-      localStorage.setItem('user', JSON.stringify(found))
+  async function login(email, password) {
+    try {
+      await authStore.login(email, password)
       return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err.response?.data?.message || 'Identifiants incorrects' }
     }
-    return { ok: false, error: 'Identifiants incorrects' }
   }
 
-  function logout() {
-    user.value = null
-    localStorage.removeItem('user')
-    localStorage.removeItem('auth_token')
+  async function logout() {
+    await authStore.logout()
   }
 
   function setActiveProfile(profile) {
@@ -242,14 +227,13 @@ export const useAppStore = defineStore('app', () => {
     })
   }
 
-  // Initialize from localStorage
-  function init() {
-    const savedUser = localStorage.getItem('user')
-    if (savedUser) {
+  // Initialize from authStore
+  async function init() {
+    if (localStorage.getItem('auth_token')) {
       try {
-        user.value = JSON.parse(savedUser)
+        await authStore.fetchCurrentUser()
       } catch (e) {
-        console.error('Failed to parse user from localStorage')
+        console.error('Failed to restore session')
       }
     }
   }
